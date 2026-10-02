@@ -1,0 +1,63 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "appress"
+dynamic = ["version"]
+description = "Official Python client for the Appress public API"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Appress" }]
+requires-python = ">=3.10"
+dependencies = [
+  "httpx>=0.27,<1",
+  "typing_extensions>=4.7; python_version < '3.11'",
+]
+keywords = ["appress", "transcription", "news", "ai", "sdk"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Typing :: Typed",
+]
+
+[project.urls]
+Homepage = "https://appress.ai"
+Repository = "https://github.com/Appress-AI/appress-sdk-py"
+Issues = "https://github.com/Appress-AI/appress-sdk-py/issues"
+Changelog = "https://github.com/Appress-AI/appress-sdk-py/blob/main/CHANGELOG.md"
+
+[dependency-groups]
+dev = ["pytest>=8", "mypy>=1.11", "ruff>=0.6"]
+
+[tool.hatch.version]
+path = "src/appress/_version.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/appress"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/appress", "tests", "README.md", "CHANGELOG.md", "LICENSE"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.mypy]
+strict = true
+files = ["src", "tests", "scripts", "examples"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF"]
