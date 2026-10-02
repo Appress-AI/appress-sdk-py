@@ -120,6 +120,7 @@ FileInput = str | os.PathLike[str] | bytes | IO[bytes] | tuple[str, FileContent]
 
 class GenerationProgress(TypedDict):
     step: str | None
+    """A ``GenerationProgressStep`` (``preparing``, ``processing``, ``finalizing``); new values may be added."""
     percent: float | None
 
 
@@ -235,6 +236,7 @@ class LiveTranscription(TypedDict):
     lastSequence: int
     mediaTitle: str | None
     failureCode: str | None
+    """A ``LiveTranscriptionFailureCode`` when ``FAILED``; new values may be added."""
     failureMessage: str | None
     turns: list[LiveTranscriptionTurn]
     createdAt: str

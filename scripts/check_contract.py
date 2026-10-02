@@ -49,6 +49,8 @@ ENUMS: dict[str, Iterable[str]] = {
     "ApiGenerationInputType": appress.INPUT_TYPES,
     "LiveTranscriptionState": appress.LIVE_TRANSCRIPTION_STATES,
     "LiveTranscriptionPlatform": appress.LIVE_TRANSCRIPTION_PLATFORMS,
+    "LiveTranscriptionFailureCode": appress.LIVE_TRANSCRIPTION_FAILURE_CODES,
+    "GenerationProgressStep": appress.GENERATION_PROGRESS_STEPS,
 }
 
 
@@ -135,6 +137,8 @@ def main() -> int:
     if config_url:
         config = load(config_url).get("data") or {}
         diff("News categories", appress.NEWS_CATEGORIES, (config.get("generations") or {}).get("newsCategories") or [])
+        live = config.get("liveTranscription") or {}
+        diff("Live failure codes", appress.LIVE_TRANSCRIPTION_FAILURE_CODES, live.get("failureCodes") or [])
         codes = [entry.get("code") for entry in (config.get("errors") or {}).get("codes") or []]
         diff("Error codes", appress.ERROR_CODES, codes)
 

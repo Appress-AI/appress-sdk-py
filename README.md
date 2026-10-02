@@ -176,6 +176,9 @@ for turn in appress.live_transcriptions.stream_turns(session["id"]):
 Pass `include_partial=True` for interim text. Breaking out of the loop does **not** stop the
 session: call `stop(id)`. Use `extend_options(id)` / `extend(id, total_duration_minutes=…)` to extend.
 
+A `FAILED` session carries `failureCode` (one of `LIVE_TRANSCRIPTION_FAILURE_CODES`, e.g. `SOURCE_UNAVAILABLE`)
+and a human-readable `failureMessage`. New codes may be added; treat unknown ones as a generic failure.
+
 ## Idempotency
 
 `create()` and `extend()` send a fresh UUID `Idempotency-Key`, reused on automatic retries.

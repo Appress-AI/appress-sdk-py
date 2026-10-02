@@ -27,19 +27,31 @@ GENERATION_STATUSES: tuple[GenerationStatus, ...] = get_args(GenerationStatus)
 InputType = Literal["TEXT", "URL", "FILE"]
 INPUT_TYPES: tuple[InputType, ...] = get_args(InputType)
 
-LiveTranscriptionState = Literal[
-    "CREATED",
-    "RESOLVING_SOURCE",
-    "CONNECTING_STT",
-    "STREAMING",
-    "STOPPING",
-    "COMPLETED",
-    "FAILED",
-]
+LiveTranscriptionState = Literal["CREATED", "STARTING", "STREAMING", "STOPPING", "COMPLETED", "FAILED"]
 LIVE_TRANSCRIPTION_STATES: tuple[LiveTranscriptionState, ...] = get_args(LiveTranscriptionState)
 
 LiveTranscriptionPlatform = Literal["youtube", "x", "microphone"]
 LIVE_TRANSCRIPTION_PLATFORMS: tuple[LiveTranscriptionPlatform, ...] = get_args(LiveTranscriptionPlatform)
+
+#: ``failureCode`` values of a ``FAILED`` live session. New values may be added.
+LiveTranscriptionFailureCode = Literal[
+    "UNSUPPORTED_URL",
+    "NOT_LIVE_STREAM",
+    "NO_AUDIO_STREAM",
+    "SOURCE_UNAVAILABLE",
+    "PROCESSING_FAILED",
+    "SERVICE_UNAVAILABLE",
+    "SERVICE_BUSY",
+    "INVALID_INPUT",
+    "RESERVATION_EXPIRED",
+    "INTERRUPTED",
+    "INTERNAL_ERROR",
+]
+LIVE_TRANSCRIPTION_FAILURE_CODES: tuple[LiveTranscriptionFailureCode, ...] = get_args(LiveTranscriptionFailureCode)
+
+#: ``progress.step`` values of a generation. New values may be added.
+GenerationProgressStep = Literal["preparing", "processing", "finalizing"]
+GENERATION_PROGRESS_STEPS: tuple[GenerationProgressStep, ...] = get_args(GenerationProgressStep)
 
 #: ``news_category`` values for NEWS and PRESS_RELEASE.
 NewsCategory = Literal[
@@ -77,7 +89,7 @@ ErrorCode = Literal[
     "INVALID_API_KEY",
     "RATE_LIMIT_EXCEEDED",
     "RATE_LIMIT_UNAVAILABLE",
-    "DB_POOL_SATURATED",
+    "SERVICE_BUSY",
 ]
 ERROR_CODES: tuple[ErrorCode, ...] = get_args(ErrorCode)
 
