@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- `expected_language` accepts `"auto"` (detects the spoken language, which may change during the session) or one of the supported language codes listed in the API reference; other values are rejected with a 400 error.
+
 ## 0.1.0 — 2026-10-02
 
 - First version, matching the features of `@appress/sdk` 0.4.0:
