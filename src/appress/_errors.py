@@ -69,7 +69,7 @@ class IdempotencyConflictError(ConflictError):
 
 
 class ConcurrencyLimitError(ConflictError):
-    """409 ``CONCURRENT_GENERATION_LIMIT``: your plan's concurrent generation limit is reached."""
+    """409 ``CONCURRENT_GENERATION_LIMIT``: your account's concurrent API generation limit is reached."""
 
 
 class PayloadTooLargeError(APIError):
