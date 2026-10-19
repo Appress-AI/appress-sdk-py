@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- `DiarizationParams` accepts `stt_lang` (source audio language) and `translate_lang` (the interview is translated into this language). Translated interviews keep one op per speaker turn with `speaker`, `start`, `end`, `color`, without `words`; turns with no translatable content are omitted. `translate_lang` takes a language code such as `en`, `ar` or `pt-BR`.
 - `expected_language` accepts `"auto"` (detects the spoken language, which may change during the session) or one of the supported language codes listed in the API reference; other values are rejected with a 400 error.
 
 ## 0.1.0 — 2026-10-02

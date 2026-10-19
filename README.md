@@ -151,7 +151,7 @@ words = get_timed_words(transcript.get("result"))  # TRANSCRIPTION / DIARIZATION
 | Feature | Line attributes |
 | --- | --- |
 | `TRANSCRIPTION` | `start`, `end` (`MM:SS`) and `words: [{t, s, e}]` on lines aligned to the audio. Not present when the transcript was translated (`translate_lang`) or no word timings are available. |
-| `DIARIZATION` | One op per speaker turn: `speaker`, `start`, `end`, `color`, optional `words`. |
+| `DIARIZATION` | One op per speaker turn: `speaker`, `start`, `end`, `color`, optional `words`. `words` is not present when the interview was translated (`translate_lang`); turns with no translatable content are then omitted. |
 | `PROOFREADING` | Corrected text, plus `result["diff"]` (delta ops from input to output). |
 | `NEWS` / `PRESS_RELEASE` | Formatting attributes (bold, italic, …); quote anchors are in `generation["quoteAnchors"]`. |
 

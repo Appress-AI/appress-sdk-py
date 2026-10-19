@@ -41,6 +41,10 @@ class TranscriptionParams(TypedDict, total=False):
 
 
 class DiarizationParams(TypedDict, total=False):
+    stt_lang: str
+    """Source audio language. Defaults to ``tr``."""
+    translate_lang: str
+    """Language code (e.g. ``en``, ``pt-BR``); when set, the interview is translated into this language."""
     speakers_expected: int
     """Expected number of speakers (at least 1)."""
     title: str
