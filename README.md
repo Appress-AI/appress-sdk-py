@@ -212,6 +212,7 @@ Verify every delivery with the endpoint secret, using the raw request body:
 ```python
 from appress import WebhookVerificationError, verify_webhook
 
+
 @app.post("/appress/webhooks")
 async def appress_webhook(request: Request) -> Response:
     try:
