@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- `live_transcriptions.create()` accepts `translation_languages` (set at creation, up to `options()["translation"]["maxLanguages"]`). Each turn has `translations` keyed by language (`status`: `pending` | `completed` | `failed`, `text` when completed); sessions and active sessions list `translationLanguages`. `options()` returns `translation.languages`, `translation.maxLanguages` and `translationReservedCostUsdPerLanguage` per duration. New types `LiveTranscriptionTurnTranslation` and `LiveTranslationOptions`.
+- Webhooks: `verify_webhook(raw_body, headers, secret)` verifies a delivery (`Appress-Webhook-Signature`, timestamp tolerance 300 s by default) and returns the typed `WebhookEvent`; raises `WebhookVerificationError`. New `WEBHOOK_EVENT_TYPES` and `WEBHOOK_TEST_EVENT_TYPE`.
+- New error codes: `LIVE_TRANSLATION_INVALID_LANGUAGE`, `LIVE_TRANSLATION_SAME_LANGUAGE`, `LIVE_TRANSLATION_LIMIT_REACHED`.
+- `LiveTranscriptionPlatform` is `"youtube"` | `"x"`; the API never returned `"microphone"` for API sessions.
+
 - `DiarizationParams` accepts `stt_lang` (source audio language) and `translate_lang` (the interview is translated into this language). Translated interviews keep one op per speaker turn with `speaker`, `start`, `end`, `color`, without `words`; turns with no translatable content are omitted. `translate_lang` takes a language code such as `en`, `ar` or `pt-BR`.
 - `expected_language` accepts `"auto"` (detects the spoken language, which may change during the session) or one of the supported language codes listed in the API reference; other values are rejected with a 400 error.
 

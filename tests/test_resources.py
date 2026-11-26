@@ -182,6 +182,18 @@ class TestLiveTranscriptions:
         assert recorder.requests[1].url.path == "/v1/live-transcriptions/s1/extend"
         assert all("idempotency-key" in r.headers for r in recorder.requests)
 
+    def test_create_sends_translation_languages(self) -> None:
+        translated = {**turn("t1", "Merhaba", True), "translations": {"en": {"status": "completed", "text": "Hello"}}}
+        recorder = Recorder(ok(live_session(translationLanguages=["en"], turns=[translated]), status=202))
+        session = client(recorder).live_transcriptions.create(url="https://youtu.be/x", translation_languages=("en",))
+        assert recorder.json(0) == {"url": "https://youtu.be/x", "translationLanguages": ["en"]}
+        assert session["translationLanguages"] == ["en"]
+        assert session["turns"][0]["translations"]["en"] == {"status": "completed", "text": "Hello"}
+
+    def test_create_rejects_a_bare_string_for_translation_languages(self) -> None:
+        with pytest.raises(TypeError):
+            client(Recorder()).live_transcriptions.create(url="https://youtu.be/x", translation_languages="en")
+
     def test_stop_sends_no_idempotency_key(self) -> None:
         recorder = Recorder(ok(live_session(state="COMPLETED")))
         client(recorder).live_transcriptions.stop("s1")

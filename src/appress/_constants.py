@@ -30,7 +30,7 @@ INPUT_TYPES: tuple[InputType, ...] = get_args(InputType)
 LiveTranscriptionState = Literal["CREATED", "STARTING", "STREAMING", "STOPPING", "COMPLETED", "FAILED"]
 LIVE_TRANSCRIPTION_STATES: tuple[LiveTranscriptionState, ...] = get_args(LiveTranscriptionState)
 
-LiveTranscriptionPlatform = Literal["youtube", "x", "microphone"]
+LiveTranscriptionPlatform = Literal["youtube", "x"]
 LIVE_TRANSCRIPTION_PLATFORMS: tuple[LiveTranscriptionPlatform, ...] = get_args(LiveTranscriptionPlatform)
 
 #: ``failureCode`` values of a ``FAILED`` live session. New values may be added.
@@ -85,6 +85,9 @@ ErrorCode = Literal[
     "LIVE_SESSION_NOT_EXTENDABLE",
     "LIVE_EXTENSION_IN_PROGRESS",
     "LIVE_EXTENSION_INVALID",
+    "LIVE_TRANSLATION_INVALID_LANGUAGE",
+    "LIVE_TRANSLATION_SAME_LANGUAGE",
+    "LIVE_TRANSLATION_LIMIT_REACHED",
     "INSUFFICIENT_API_CREDIT",
     "INVALID_API_KEY",
     "RATE_LIMIT_EXCEEDED",
@@ -98,3 +101,17 @@ TERMINAL_GENERATION_STATUSES: tuple[GenerationStatus, ...] = ("COMPLETED", "ERRO
 
 #: A live session in one of these states never changes again.
 TERMINAL_LIVE_STATES: tuple[LiveTranscriptionState, ...] = ("COMPLETED", "FAILED")
+
+WebhookEventType = Literal[
+    "generation.completed",
+    "generation.failed",
+    "generation.cancelled",
+    "live_transcription.started",
+    "live_transcription.completed",
+    "live_transcription.failed",
+]
+#: Webhook event types an endpoint can subscribe to (published in ``GET /api-reference/config``).
+WEBHOOK_EVENT_TYPES: tuple[WebhookEventType, ...] = get_args(WebhookEventType)
+
+#: Event type of the deliveries sent with "send test event".
+WEBHOOK_TEST_EVENT_TYPE = "webhook.test"

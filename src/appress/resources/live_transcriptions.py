@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import inspect
 import uuid
-from collections.abc import AsyncIterator, Awaitable, Callable, Iterator, Mapping
+from collections.abc import AsyncIterator, Awaitable, Callable, Iterator, Mapping, Sequence
 from typing import Any, cast
 from urllib.parse import quote
 
@@ -26,6 +26,7 @@ CREATE_FIELDS = {
     "max_speakers": "maxSpeakers",
     "include_words": "includeWords",
     "max_duration_minutes": "maxDurationMinutes",
+    "translation_languages": "translationLanguages",
 }
 
 #: Python argument → JSON field of ``POST /v1/live-transcriptions/{id}/extend``.
@@ -59,6 +60,14 @@ def _request(
         max_retries=max_retries,
         headers=extra_headers or {},
     )
+
+
+def _language_list(languages: Sequence[str] | None) -> list[str] | None:
+    if languages is None:
+        return None
+    if isinstance(languages, str):
+        raise TypeError("translation_languages must be a list of language codes, e.g. ['en']")
+    return list(languages)
 
 
 def _create_body(values: Mapping[str, Any]) -> dict[str, Any]:
@@ -130,6 +139,7 @@ class LiveTranscriptions:
         max_speakers: int | None = None,
         include_words: bool | None = None,
         max_duration_minutes: int | None = None,
+        translation_languages: Sequence[str] | None = None,
         idempotency_key: str | None = None,
         timeout: float | None = None,
         max_retries: int | None = None,
@@ -139,6 +149,10 @@ class LiveTranscriptions:
 
         ``max_duration_minutes`` is one of the durations from :meth:`options` (default 120).
         ``max_speakers`` (1-10) only together with ``speaker_labels=True``.
+        ``translation_languages`` (set only at creation, up to ``options()["translation"]["maxLanguages"]``,
+        codes from ``options()["translation"]["languages"]``) translates each turn; each language adds
+        ``translationReservedCostUsdPerLanguage`` to the reservation. A language that cannot be opened is
+        skipped and the session continues; ``translationLanguages`` on the session lists the active ones.
         """
         body = _create_body(
             {
@@ -149,6 +163,7 @@ class LiveTranscriptions:
                 "max_speakers": max_speakers,
                 "include_words": include_words,
                 "max_duration_minutes": max_duration_minutes,
+                "translation_languages": _language_list(translation_languages),
             }
         )
         request = _request(
@@ -294,6 +309,7 @@ class AsyncLiveTranscriptions:
         max_speakers: int | None = None,
         include_words: bool | None = None,
         max_duration_minutes: int | None = None,
+        translation_languages: Sequence[str] | None = None,
         idempotency_key: str | None = None,
         timeout: float | None = None,
         max_retries: int | None = None,
@@ -309,6 +325,7 @@ class AsyncLiveTranscriptions:
                 "max_speakers": max_speakers,
                 "include_words": include_words,
                 "max_duration_minutes": max_duration_minutes,
+                "translation_languages": _language_list(translation_languages),
             }
         )
         request = _request(

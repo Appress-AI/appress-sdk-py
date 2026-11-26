@@ -172,12 +172,61 @@ for turn in appress.live_transcriptions.stream_turns(session["id"]):
     print(f"[{turn['speaker'] or '-'}] {turn['text']}")
 ```
 
+To translate each turn while the session runs, pass `translation_languages` when you create it
+(codes and the limit come from `options()["translation"]`; each language adds
+`translationReservedCostUsdPerLanguage` to the reservation). Languages cannot be changed after the
+session starts. A language that cannot be opened is skipped and the session continues;
+`session["translationLanguages"]` lists the active ones.
+
+```python
+session = appress.live_transcriptions.create(
+    url="https://www.youtube.com/watch?v=…",
+    expected_language="tr",
+    translation_languages=["en", "de"],
+)
+
+for turn in appress.live_transcriptions.stream_turns(session["id"]):
+    en = turn["translations"].get("en")
+    print(turn["text"], f"→ {en['text']}" if en and en["status"] == "completed" else "")
+```
+
+The saved result of the session stays in the spoken language; translations are only on the turns.
+
 `stream_turns` yields each finalised turn once and ends when the session is `COMPLETED` or `FAILED`.
 Pass `include_partial=True` for interim text. Breaking out of the loop does **not** stop the
 session: call `stop(id)`. Use `extend_options(id)` / `extend(id, total_duration_minutes=…)` to extend.
 
 A `FAILED` session carries `failureCode` (one of `LIVE_TRANSCRIPTION_FAILURE_CODES`, e.g. `SOURCE_UNAVAILABLE`)
 and a human-readable `failureMessage`. New codes may be added; treat unknown ones as a generic failure.
+
+## Webhooks
+
+Register an HTTPS endpoint in the developer portal to receive events instead of polling:
+`generation.completed`, `generation.failed`, `generation.cancelled`, `live_transcription.started`,
+`live_transcription.completed`, `live_transcription.failed` (and `webhook.test` from the portal's test button).
+Events carry ids and status, not results: fetch the resource with `generations.retrieve(id)` or
+`live_transcriptions.retrieve(id)`.
+
+Verify every delivery with the endpoint secret, using the raw request body:
+
+```python
+from appress import WebhookVerificationError, verify_webhook
+
+@app.post("/appress/webhooks")
+async def appress_webhook(request: Request) -> Response:
+    try:
+        event = verify_webhook(await request.body(), request.headers, os.environ["APPRESS_WEBHOOK_SECRET"])
+    except WebhookVerificationError:
+        return Response(status_code=400)
+    if event["type"] == "generation.completed":
+        generation = appress.generations.retrieve(event["data"]["id"])
+        ...
+    return Response(status_code=200)
+```
+
+Deliveries are at least once and unordered; deduplicate on `event["id"]`. Any non-2xx response is retried
+on a schedule published in `GET /api-reference/config`; `410 Gone` disables the endpoint. During a secret
+rotation both the new and the previous secret sign each delivery, so either one verifies.
 
 ## Idempotency
 

@@ -90,6 +90,7 @@ def live_session(**overrides: Any) -> dict[str, Any]:
         "startedAt": None,
         "completedAt": None,
         "reservedCostUsd": "1.000000",
+        "translationLanguages": [],
         **overrides,
     }
 
@@ -105,6 +106,7 @@ def turn(turn_id: str, text: str, is_final: bool, sequence: int = 1) -> dict[str
         "speaker": None,
         "language": None,
         "words": None,
+        "translations": {},
     }
 
 

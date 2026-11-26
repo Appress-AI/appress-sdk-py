@@ -215,6 +215,12 @@ class LiveTranscriptionWord(TypedDict):
     speaker: str | None
 
 
+class LiveTranscriptionTurnTranslation(TypedDict):
+    status: Literal["pending", "completed", "failed"]
+    text: NotRequired[str]
+    """Translated text; present only when ``status`` is ``"completed"``."""
+
+
 class LiveTranscriptionTurn(TypedDict):
     turnId: str
     sequence: int
@@ -226,6 +232,8 @@ class LiveTranscriptionTurn(TypedDict):
     language: str | None
     words: list[LiveTranscriptionWord] | None
     """Set only when the session was started with ``include_words=True``."""
+    translations: dict[str, LiveTranscriptionTurnTranslation]
+    """Translations of this turn keyed by language code; ``{}`` when the session has no translation languages."""
 
 
 class LiveTranscription(TypedDict):
@@ -247,6 +255,8 @@ class LiveTranscription(TypedDict):
     startedAt: str | None
     completedAt: str | None
     reservedCostUsd: str
+    translationLanguages: list[str]
+    """Active translation languages, sorted."""
 
 
 class ActiveLiveTranscription(TypedDict):
@@ -261,15 +271,26 @@ class ActiveLiveTranscription(TypedDict):
     startedAt: str | None
     createdAt: str
     reservedCostUsd: str
+    translationLanguages: list[str]
+    """Active translation languages, sorted."""
 
 
 class LiveDurationOption(TypedDict):
     minutes: int
     reservedCostUsd: str
+    translationReservedCostUsdPerLanguage: str
+    """Added to ``reservedCostUsd`` for each translation language."""
+
+
+class LiveTranslationOptions(TypedDict):
+    languages: list[str]
+    """Accepted ``translation_languages`` codes."""
+    maxLanguages: int
 
 
 class LiveTranscriptionOptions(TypedDict):
     durationOptions: list[LiveDurationOption]
+    translation: LiveTranslationOptions
 
 
 class LiveExtendOption(TypedDict):
@@ -282,3 +303,45 @@ class LiveTranscriptionExtendOptions(TypedDict):
     currentDurationMinutes: int
     currentReservedCostUsd: str
     options: list[LiveExtendOption]
+
+
+# ---------------------------------------------------------------------------
+# Webhooks
+# ---------------------------------------------------------------------------
+
+
+class WebhookGenerationData(TypedDict):
+    object: Literal["generation"]
+    id: str
+    featureType: FeatureType
+    status: GenerationStatus
+    apiKeyId: str | None
+    completedAt: str | None
+    error: NotRequired[str | None]
+    """Set for ``generation.failed`` and ``generation.cancelled``."""
+
+
+class WebhookLiveTranscriptionData(TypedDict):
+    object: Literal["live_transcription"]
+    id: str
+    generationId: str
+    state: LiveTranscriptionState
+    apiKeyId: str | None
+    startedAt: NotRequired[str | None]
+    completedAt: NotRequired[str | None]
+    failureCode: NotRequired[str | None]
+    failureMessage: NotRequired[str | None]
+
+
+class WebhookTestData(TypedDict):
+    object: Literal["webhook_test"]
+    endpointId: str
+
+
+class WebhookEvent(TypedDict):
+    id: str
+    """Unique event id; also sent as ``Appress-Webhook-Id``. Deliveries are at least once: deduplicate on it."""
+    type: str
+    """One of ``WEBHOOK_EVENT_TYPES`` or ``"webhook.test"``; newer types may be added."""
+    createdAt: str
+    data: WebhookGenerationData | WebhookLiveTranscriptionData | WebhookTestData

@@ -69,11 +69,12 @@ OBJECTS: dict[str, list[str]] = {
     "ApiActiveLiveSessionDto": typed_dict_fields(appress.ActiveLiveTranscription),
     "ApiLiveOptionsDto": typed_dict_fields(appress.LiveTranscriptionOptions),
     "ApiLiveDurationOptionDto": typed_dict_fields(appress.LiveDurationOption),
+    "ApiLiveTranslationOptionsDto": typed_dict_fields(appress.LiveTranslationOptions),
     "ApiLiveExtendOptionsDto": typed_dict_fields(appress.LiveTranscriptionExtendOptions),
     "ApiLiveExtendOptionDto": typed_dict_fields(appress.LiveExtendOption),
     "CreateApiGenerationDto": list(generations.CREATE_FIELDS.values()),
     # `source` is intentionally not exposed: the API only accepts its default.
-    "CreateLiveTranscriptionDto": [*live_transcriptions.CREATE_FIELDS.values(), "source"],
+    "CreateApiLiveTranscriptionDto": [*live_transcriptions.CREATE_FIELDS.values(), "source"],
     "ExtendApiLiveTranscriptionDto": list(live_transcriptions.EXTEND_FIELDS.values()),
 }
 
@@ -141,6 +142,14 @@ def main() -> int:
         diff("Live failure codes", appress.LIVE_TRANSCRIPTION_FAILURE_CODES, live.get("failureCodes") or [])
         codes = [entry.get("code") for entry in (config.get("errors") or {}).get("codes") or []]
         diff("Error codes", appress.ERROR_CODES, codes)
+        webhooks = config.get("webhooks") or {}
+        diff("Webhook event types", appress.WEBHOOK_EVENT_TYPES, webhooks.get("eventTypes") or [])
+        if webhooks.get("testEventType", appress.WEBHOOK_TEST_EVENT_TYPE) != appress.WEBHOOK_TEST_EVENT_TYPE:
+            problems.append("Webhook test event type differs")
+        published = [webhooks.get(k) for k in ("idHeader", "timestampHeader", "signatureHeader")]
+        ours = [appress.WEBHOOK_ID_HEADER, appress.WEBHOOK_TIMESTAMP_HEADER, appress.WEBHOOK_SIGNATURE_HEADER]
+        if webhooks and [str(h).lower() for h in published] != ours:
+            problems.append("Webhook header names differ")
 
     if problems:
         print(f"Contract drift ({source}):\n- " + "\n- ".join(problems), file=sys.stderr)
